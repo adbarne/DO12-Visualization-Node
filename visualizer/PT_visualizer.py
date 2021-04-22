@@ -5,6 +5,7 @@ from std_msgs.msg import String
 import time
 import subprocess, shlex, psutil
 from deep_orange_msgs.msg import PtReport
+import os
 
 t1 = time.time()
 
@@ -27,13 +28,19 @@ data_value = ["null",
               'null']
 
 # FREQUENCY OF DATAVIS
-print_interval = 0.2
+print_interval = 0.1
 
 # init rosbag recorder
-# topics_str = '/pt_report'
-# command = 'ros2 bag record' + topics_str
+rosbag_topics = ['/deep_orange_messages/pt_report']
+topics_str = ' '.join(rosbag_topics)
+date = str(time.ctime(time.time()))
+date = date.replace(' ','_')
+date = date.replace(':','')
+out_dir = ' --output ~/Desktop/PT_vis_rosbag2/PT_' + date + '/'
+command = 'ros2 bag record ' + topics_str + out_dir 
 # command = shlex.split(command)
 # rosbag_proc = subprocess.Popen(command)
+os.system(command + '&')
 
 class MinimalSubscriber(Node):
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import subprocess, shlex, psutil
 from raptor_dbw_msgs.msg import SteeringReport,Brake2Report, BrakeCmd
 from autoware_auto_msgs.msg import VehicleKinematicState
-# from novatel_gps_msgs.msg import Inspva
+import os
 
 t1 = time.time()
 yaw_rate = []
@@ -18,9 +18,9 @@ data_desc = ['Time',      # always print time!
            'Rear BRK pres',
            'Steer motor cmd',
            'Steer motor fdbk',
-           'X',
-           'Y',
+           'Long. vel',
            'Yaw rate']
+
            # Add azimuth rate from the GNSS, 
            # Vehicle speed from motec,
            #  Steering motor demand as well as feedback, 
@@ -49,14 +49,25 @@ data_value = ['',   # always print time!
            '',
            '']
 
-# FREQUENCY OF DATAVIS
-print_interval = 0.2
+# FREQUENCY OF DATAVIS PER EACH CALLBACK
+print_interval = 0.1
 
 # init rosbag recorder
-# topics_str = ' '.join(topics)
-# command = 'ros2 bag record' + topics_str
+rosbag_topics = ['/raptor_dbw_interface/brake_cmd',
+                '/raptor_dbw_interface/brake_2_report',
+                '/raptor_dbw_interface/steering_report',
+                '/vehicle/vehicle_kinematic_state']
+
+topics_str = ' '.join(rosbag_topics)
+date = str(time.ctime(time.time()))
+date = date.replace(' ','_')
+date = date.replace(':','')
+out_dir = ' --output ~/Desktop/VD_vis_rosbag2/VD_' + date + '/'
+command = 'ros2 bag record ' + topics_str + out_dir 
 # command = shlex.split(command)
 # rosbag_proc = subprocess.Popen(command)
+# subprocess.call(command)
+os.system(command + ' &')
 
 class MinimalSubscriber(Node):
 
@@ -185,9 +196,9 @@ class MinimalSubscriber(Node):
 
     def VehicleKinematicState(self, msg):   
         global data_value     
-        data_value[6] = msg.state.x
-        data_value[7] = msg.state.y
-        data_value[8] = msg.heading_rate_rps
+        data_value[6] = msg.state.longitudinal_velocity
+        data_value[7] = msg.heading_rate_rps
+        
         def plot_data(x):
 
             # create sliding window for x

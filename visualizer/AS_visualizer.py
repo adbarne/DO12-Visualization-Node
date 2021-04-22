@@ -8,8 +8,7 @@ from raptor_dbw_msgs.msg import BrakeCmd, AcceleratorPedalCmd, SteeringCmd
 from deep_orange_msgs.msg import CtReport,RcToCt, CtReport
 from autoware_auto_msgs.msg import TrajectoryPoint, VehicleKinematicState
 from geometry_msgs.msg import Transform
-from novatel_gps_msgs.msg import NovatelPosition
-
+import os
 t1 = time.time()
 
 # kinematic state GNSS (x,y,heading)
@@ -27,8 +26,7 @@ data_desc = ['Time',
            'X',
            'Y',
            'Yaw rate',
-           'GNSS sln type'
-           '']
+           'Longitudinal vel']
 
 # INPUT MESSAGES FIELDS
 data_value = ['null',
@@ -52,13 +50,25 @@ data_value = ['null',
            'null']
 
 # FREQUENCY OF DATAVIS
-print_interval = 0.2
+print_interval = 0.1
 
 # init rosbag recorder
-# topics_str = ' '.join(topics)
-# command = 'ros2 bag record' + topics_str
+rosbag_topics = ['/raptor_dbw_interface/accelerator_pedal_cmd',
+                '/raptor_dbw_interface/brake_cmd',
+                '/raptor_dbw_interface/steering_cmd',
+                '/raptor_dbw_interface/ct_report',
+                '/raptor_dbw_interface/gear_cmd',
+                '/raptor_dbw_interface/rc_to_ct',
+                '/vehicle/vehicle_kinematic_state']
+topics_str = ' '.join(rosbag_topics)
+date = str(time.ctime(time.time()))
+date = date.replace(' ','_')
+date = date.replace(':','')
+out_dir = ' --output ~/Desktop/AS_vis_rosbag2/AS_' + date + '/'
+command = 'ros2 bag record ' + topics_str + out_dir 
 # command = shlex.split(command)
 # rosbag_proc = subprocess.Popen(command)
+os.system(command + '&')
 
 class MinimalSubscriber(Node):
 
@@ -98,12 +108,7 @@ class MinimalSubscriber(Node):
             VehicleKinematicState,
             '/vehicle/vehicle_kinematic_state',
             self.VehicleKinematicState,
-            10)    
-        # self.gnss = self.create_subscription(
-        #     NovatelPosition,
-        #     '/bestpos',
-        #     self.NovatelPosition,
-        #     10)             
+            10)             
         # self.subscription # prevent unused variable warning
 
     def AcceleratorPedalCmd(self, msg):        
@@ -116,7 +121,7 @@ class MinimalSubscriber(Node):
         dt = time.time() - t1
         if dt > print_interval: 
             for i in range(len(data_value)):
-                try:
+                try:                    
                     print('%20s: %20s' % (data_desc[i], data_value[i]))  
                 except:
                     pass
@@ -208,7 +213,7 @@ class MinimalSubscriber(Node):
         data_value[7] = msg.state.x
         data_value[8] = msg.state.y
         data_value[9] = msg.heading_rate_rps
-        data_value[10] = msg.position_type
+        data_value[10] = msg.state.longitudinal_velocity_mps
 
         # calculate time between messages
         global t1
