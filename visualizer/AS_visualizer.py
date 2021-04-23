@@ -58,6 +58,7 @@ print_interval = 0.1
 
 # init rosbag recorder
 rosbag_topics = ['/raptor_dbw_interface/accelerator_pedal_cmd',
+                '/raptor_dbw_interface/misc_report',
                 '/raptor_dbw_interface/brake_cmd',
                 '/raptor_dbw_interface/steering_cmd',
                 '/raptor_dbw_interface/ct_report',
