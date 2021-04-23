@@ -24,8 +24,12 @@ data_desc = ['Time',
             'Gear cmd',             
             'Steer cmd',
             'Track cond',
+            'Black', 
+            'Checkered',
+            'Purple',
             'X',
             'Y',
+            'orientation',
             'Yaw rate',
             'Longitudinal vel',
             'Joy stop',
@@ -57,16 +61,17 @@ data_value = ['null',
 print_interval = 0.1
 
 # init rosbag recorder
-rosbag_topics = ['/raptor_dbw_interface/accelerator_pedal_cmd',
+rosbag_topics = ['/raptor_dbw_interface/ct_report',
                 '/raptor_dbw_interface/misc_report',
+                '/raptor_dbw_interface/accelerator_pedal_cmd',
                 '/raptor_dbw_interface/brake_cmd',
                 '/raptor_dbw_interface/steering_cmd',
-                '/raptor_dbw_interface/ct_report',
                 '/raptor_dbw_interface/gear_cmd',
                 '/raptor_dbw_interface/rc_to_ct',
                 '/vehicle/vehicle_kinematic_state',
                 '/vehicle/emergency_joystick',
-                '/vehicle/emergency_heartbeat']
+                '/vehicle/emergency_heartbeat',
+                '/diagnostics/heartbeat']
 topics_str = ' '.join(rosbag_topics)
 date = str(time.ctime(time.time()))
 date = date.replace(' ','_')
@@ -154,7 +159,6 @@ class MinimalSubscriber(Node):
 
     def MiscReport(self, msg):        
         global data_value 
-        # data_value[8] = time.ctime(time.time())
         data_value[2] = msg.sys_state
         
         # calculate time between messages
@@ -170,7 +174,6 @@ class MinimalSubscriber(Node):
             
     def AcceleratorPedalCmd(self, msg):        
         global data_value 
-        # data_value[0] = time.ctime(time.time())
         data_value[3] = msg.pedal_cmd
 
         # calculate time between messages
@@ -186,7 +189,6 @@ class MinimalSubscriber(Node):
 
     def BrakeCmd(self, msg):
         global data_value 
-        # data_value[2] = time.ctime(time.time())
         data_value[4] = msg.pedal_cmd
 
         # calculate time between messages
@@ -202,7 +204,6 @@ class MinimalSubscriber(Node):
 
     def GearCmd(self, msg):        
         global data_value 
-        # data_value[4] = time.ctime(time.time())
         data_value[5] = msg.gear_cmd
         
         # calculate time between messages
@@ -218,7 +219,6 @@ class MinimalSubscriber(Node):
 
     def SteeringCmd(self, msg):        
         global data_value 
-        # data_value[6] = time.ctime(time.time())
         data_value[6] = msg.angle_cmd
         
         # calculate time between messages
@@ -234,8 +234,10 @@ class MinimalSubscriber(Node):
 
     def RcToCt(self, msg):        
         global data_value 
-        # data_value[10] = time.ctime(time.time())
         data_value[7] = msg.track_cond
+        data_value[8] = msg.black[15]
+        data_value[9] = msg.checkered[15]
+        data_value[10] = msg.purple[15]
         
         # calculate time between messages
         global t1
@@ -250,11 +252,11 @@ class MinimalSubscriber(Node):
 
     def VehicleKinematicState(self, msg):        
         global data_value 
-        # data_value[12] = time.ctime(time.time())
-        data_value[8] = msg.state.x
-        data_value[9] = msg.state.y
-        data_value[10] = msg.heading_rate_rps
-        data_value[11] = msg.state.longitudinal_velocity_mps
+        data_value[11] = msg.state.x
+        data_value[12] = msg.state.y
+        data_value[13] = msg.heading
+        data_value[14] = msg.heading_rate_rps
+        data_value[15] = msg.state.longitudinal_velocity_mps
 
         # calculate time between messages
         global t1
@@ -269,8 +271,7 @@ class MinimalSubscriber(Node):
 
     def EmergencyJoy(self, msg):        
         global data_value 
-        # data_value[12] = time.ctime(time.time())
-        data_value[12] = msg.emergency_joystick
+        data_value[16] = msg.emergency_joystick
 
         # calculate time between messages
         global t1
@@ -285,8 +286,7 @@ class MinimalSubscriber(Node):
 
     def EmergencyHeartbeat(self, msg):        
         global data_value 
-        # data_value[12] = time.ctime(time.time())
-        data_value[13] = msg.emergency_heartbeat
+        data_value[17] = msg.emergency_heartbeat
 
         # calculate time between messages
         global t1
@@ -301,8 +301,7 @@ class MinimalSubscriber(Node):
 
     def Heartbeat(self, msg):        
         global data_value 
-        # data_value[12] = time.ctime(time.time())
-        data_value[14] = msg.diagnostic_heartbeat_curr_value
+        data_value[18] = msg.diagnostic_heartbeat_curr_value
 
         # calculate time between messages
         global t1
