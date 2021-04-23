@@ -38,8 +38,6 @@ date = date.replace(' ','_')
 date = date.replace(':','')
 out_dir = ' --output ~/Desktop/PT_vis_rosbag2/PT_' + date + '/'
 command = 'ros2 bag record ' + topics_str + out_dir 
-# command = shlex.split(command)
-# rosbag_proc = subprocess.Popen(command)
 os.system(command + '&')
 
 class MinimalSubscriber(Node):

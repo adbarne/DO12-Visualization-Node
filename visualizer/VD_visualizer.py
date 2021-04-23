@@ -30,24 +30,24 @@ data_desc = ['Time',      # always print time!
            # from Velocty north, Velocity east, Azimuth & Azimuth rate)
 
 # INPUT MESSAGES FOR EACH COLUMN HERE
-data_value = ['',   # always print time!
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '',
-           '']
+data_value = ['null',   # always print time!
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null',
+           'null']
 
 # FREQUENCY OF DATAVIS PER EACH CALLBACK
 print_interval = 0.1
@@ -64,9 +64,6 @@ date = date.replace(' ','_')
 date = date.replace(':','')
 out_dir = ' --output ~/Desktop/VD_vis_rosbag2/VD_' + date + '/'
 command = 'ros2 bag record ' + topics_str + out_dir 
-# command = shlex.split(command)
-# rosbag_proc = subprocess.Popen(command)
-# subprocess.call(command)
 os.system(command + ' &')
 
 class MinimalSubscriber(Node):
